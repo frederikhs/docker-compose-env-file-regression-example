@@ -28,4 +28,4 @@ jobs:
         run: |
           /tmp/docker-compose-v2.27.0 --env-file .env.prod config > v2.27.0.env.result
           /tmp/docker-compose-v2.27.1 --env-file .env.prod config > v2.27.1.env.result
-          cmp v2.27.0.env.result v2.27.1.env.result
+          diff v2.27.0.env.result v2.27.1.env.result
