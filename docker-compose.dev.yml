@@ -1,0 +1,4 @@
+services:
+  service:
+    ports:
+      - "1234:1234"

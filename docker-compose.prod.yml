@@ -1,0 +1,4 @@
+services:
+  service:
+    ports:
+      - "5678:5678"

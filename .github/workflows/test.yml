@@ -1,0 +1,31 @@
+name: Test
+on: push
+
+jobs:
+  tets:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Docker Compose v2.27.0
+        run: |
+          curl -SL https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-x86_64 -o /tmp/docker-compose-v2.27.0
+          chmod +x /tmp/docker-compose-v2.27.0
+
+      - name: Download Docker Compose v2.27.1
+        run: |
+          curl -SL https://github.com/docker/compose/releases/download/v2.27.1/docker-compose-linux-x86_64 -o /tmp/docker-compose-v2.27.1
+          chmod + /tmp/docker-compose-v2.27.1
+
+      - name: Test output without env override
+        run: |
+          /tmp/docker-compose-v2.27.0 config > v2.27.0.result
+          /tmp/docker-compose-v2.27.1 config > v2.27.1.result
+          diff v2.27.0.result v2.27.1.result
+
+      - name: Test output with env override
+        run: |
+          /tmp/docker-compose-v2.27.0 --env-file .env.prod config > v2.27.0.env.result
+          /tmp/docker-compose-v2.27.1 --env-file .env.prod config > v2.27.1.env.result
+          cmp v2.27.0.env.result v2.27.1.env.result
