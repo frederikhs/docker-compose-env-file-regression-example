@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  test-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,3 +31,35 @@ jobs:
           /tmp/docker-compose-v2.27.0 --env-file .env.prod config > v2.27.0.env.result
           /tmp/docker-compose-v2.27.1 --env-file .env.prod config > v2.27.1.env.result
           diff v2.27.0.env.result v2.27.1.env.result
+  test-head:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout docker/compose
+        uses: actions/checkout@v4
+        with:
+          repository: docker/compose
+          path: ./docker-compose-repository
+
+      - name: Building
+        working-directory: ./docker-compose-repository
+        run: make
+
+      - name: Download Docker Compose v2.27.0
+        run: |
+          curl -SL https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-x86_64 -o /tmp/docker-compose-v2.27.0
+          chmod +x /tmp/docker-compose-v2.27.0
+
+      - name: Test output without env override
+        run: |
+          /tmp/docker-compose-v2.27.0 config > v2.27.0.result
+          ./docker-compose-repository/bin/build/docker-compose config > HEAD.result
+          diff v2.27.0.result HEAD.result
+
+      - name: Test output with env override
+        run: |
+          /tmp/docker-compose-v2.27.0 --env-file .env.prod config > v2.27.0.env.result
+          ./docker-compose-repository/bin/build/docker-compose --env-file .env.prod config > HEAD.env.result
+          diff v2.27.0.env.result HEAD.env.result
